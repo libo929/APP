@@ -1,1 +1,1 @@
-# This is the APPRIL Platform for calorimeter Prototype (APP)
+# This is the APRIL Platform for calorimeter Prototype (APP)
