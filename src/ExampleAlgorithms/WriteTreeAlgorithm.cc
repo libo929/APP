@@ -38,16 +38,32 @@ StatusCode WriteTreeAlgorithm::Run()
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentList(*this, pClusterList));
 
     int nClusters(0);
+    int nMainClusters(0);
     FloatVector clusterEnergies;
+    float mainClustersEnergy(0.);
+    float eventEnergy(0.);
 
     for (const Cluster *const pCluster : *pClusterList)
     {
-        clusterEnergies.push_back(pCluster->GetHadronicEnergy());
+		float clusterEnergy = pCluster->GetHadronicEnergy();
+
+        clusterEnergies.push_back(clusterEnergy);
+		eventEnergy += clusterEnergy;
+
+		if(clusterEnergy > 0.3) 
+		{ 
+			mainClustersEnergy += clusterEnergy;
+			++nMainClusters;
+		}
+
         ++nClusters;
     }
 
-    PANDORA_MONITORING_API(SetTreeVariable(this->GetPandora(), m_treeName, "nClusters", nClusters));
-    PANDORA_MONITORING_API(SetTreeVariable(this->GetPandora(), m_treeName, "clusterEnergies", &clusterEnergies));
+    PANDORA_MONITORING_API(SetTreeVariable(this->GetPandora(), m_treeName, "nClusters",          nClusters));
+    PANDORA_MONITORING_API(SetTreeVariable(this->GetPandora(), m_treeName, "nMainClusters",      nMainClusters));
+    PANDORA_MONITORING_API(SetTreeVariable(this->GetPandora(), m_treeName, "clusterEnergies",    &clusterEnergies));
+    PANDORA_MONITORING_API(SetTreeVariable(this->GetPandora(), m_treeName, "mainClustersEnergy", mainClustersEnergy));
+    PANDORA_MONITORING_API(SetTreeVariable(this->GetPandora(), m_treeName, "eventEnergy",        eventEnergy));
     PANDORA_MONITORING_API(FillTree(this->GetPandora(), m_treeName));
 
     return STATUS_CODE_SUCCESS;

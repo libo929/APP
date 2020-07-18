@@ -51,16 +51,16 @@ include_directories(${ROOT_INCLUDE_DIRS})
 link_libraries(${ROOT_LIBRARIES})
 add_definitions(${ROOT_DEFINITIONS})
 
-find_package( ArborContent REQUIRED )
-if (ArborContent_FOUND)
-	list(APPEND CMAKE_MODULE_PATH ${ArborContent_ROOT}/cmake)
+find_package( APRILContent REQUIRED )
+if (APRILContent_FOUND)
+	list(APPEND CMAKE_MODULE_PATH ${APRILContent_ROOT}/cmake)
 else()
-	message(FATAL_ERROR "ArborContent is not found.")
+	message(FATAL_ERROR "APRILContent is not found.")
 endif()
 
-include_directories(${ArborContent_INCLUDE_DIRS})
-link_libraries(${ArborContent_LIBRARIES})
-add_definitions(${ArborContent_DEFINITIONS})
+include_directories(${APRILContent_INCLUDE_DIRS})
+link_libraries(${APRILContent_LIBRARIES})
+add_definitions(${APRILContent_DEFINITIONS})
 
 if(PANDORA_MONITORING)
     find_package(PandoraMonitoring 03.00.00 REQUIRED)
@@ -77,7 +77,7 @@ message(${CMAKE_CURRENT_SOURCE_DIR})
 
 #-------------------------------------------------------------------------------------------------------------------------------------------
 # Low level settings - compiler etc
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -pedantic -Wno-long-long -Wno-sign-compare -Wshadow -fno-strict-aliasing -std=c++11 ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -pedantic -Wno-long-long -Wno-sign-compare -fno-strict-aliasing -std=c++11 ${CMAKE_CXX_FLAGS}")
 
 include(CheckCXXCompilerFlag)
 unset(COMPILER_SUPPORTS_CXX_FLAGS CACHE)

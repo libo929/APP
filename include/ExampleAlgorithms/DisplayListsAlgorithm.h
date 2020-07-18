@@ -43,6 +43,9 @@ private:
     bool    m_displayCurrentClusters;       ///< Whether to display the current cluster list
     bool    m_displayCurrentVertices;       ///< Whether to display the current vertex list
     bool    m_displayCurrentPfos;           ///< Whether to display the current pfo list
+
+	float   m_energyThreshold;
+	float   m_timeThreshold;
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------

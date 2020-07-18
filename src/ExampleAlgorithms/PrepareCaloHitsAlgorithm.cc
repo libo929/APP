@@ -20,15 +20,16 @@ using namespace pandora;
 namespace example_content
 {
 
-arbor_content::CaloHitFactory PrepareCaloHitsAlgorithm::m_pCaloHitFactory;
+april_content::CaloHitFactory PrepareCaloHitsAlgorithm::m_pCaloHitFactory;
 
 int PrepareCaloHitsAlgorithm::m_nEvent = 0;
 
 PrepareCaloHitsAlgorithm::PrepareCaloHitsAlgorithm() :
-    m_nCaloHitsToMake(0),
     m_setCurrentListToInputList(false),
     m_worldSideLength(1000.f),
     m_groupSideLength(10.f),
+	m_energyThreshold(0.),
+	m_timeThreshold(0.),
     m_randomEngine(12345)
 {
 }
@@ -70,8 +71,6 @@ pandora::StatusCode PrepareCaloHitsAlgorithm::Run()
 	inTree->SetBranchAddress("energyVec", &energyVec);
 	inTree->SetBranchAddress("timeVec",   &timeVec);
 
-	std::cout << "Event: " << inTree->GetEntries() << std::endl;
-
     //ExampleCaloHitFactory exampleCaloHitFactory;
     std::uniform_real_distribution<float> randomDistribution(0.f, 1.f);
 
@@ -95,6 +94,9 @@ pandora::StatusCode PrepareCaloHitsAlgorithm::Run()
 				      << ", time: " << timeVec->at(ihit) << std::endl;
 #endif
 
+			if(energyVec->at(ihit) < m_energyThreshold) continue;
+			if(timeVec->at(ihit) < m_timeThreshold) continue;
+
             const CartesianVector hitPosition( posVecX->at(ihit), posVecY->at(ihit), posVecZ->at(ihit) ); 
 
             // Mainly dummy parameters
@@ -103,16 +105,23 @@ pandora::StatusCode PrepareCaloHitsAlgorithm::Run()
             parameters.m_expectedDirection = CartesianVector(0.f, 0.f, 1.f);
             parameters.m_cellNormalVector = CartesianVector(0.f, 0.f, 1.f);
             parameters.m_cellGeometry = RECTANGULAR;
-            parameters.m_cellSize0 = 10.1f;
-            parameters.m_cellSize1 = 10.1f;
-            parameters.m_cellThickness = 5.5f;
+			
+			// -> real parameters
+            //parameters.m_cellSize0 = 10.1f;
+            //parameters.m_cellSize1 = 10.1f;
+            //parameters.m_cellThickness = 5.5f;
+			// -> for display
+            parameters.m_cellSize0 = 9.f;
+            parameters.m_cellSize1 = 9.f;
+            parameters.m_cellThickness = 3.f;
+
             parameters.m_nCellRadiationLengths = 1.f;
             parameters.m_nCellInteractionLengths = 1.f;
             parameters.m_time = timeVec->at(ihit);
-            parameters.m_inputEnergy = energyVec->at(ihit);
+            parameters.m_inputEnergy = energyVec->at(ihit) * 0.001; // to GeV
             parameters.m_mipEquivalentEnergy = 1.f;
-            parameters.m_electromagneticEnergy = energyVec->at(ihit);
-            parameters.m_hadronicEnergy = energyVec->at(ihit);
+            parameters.m_electromagneticEnergy = energyVec->at(ihit) * 0.001;
+            parameters.m_hadronicEnergy = energyVec->at(ihit) * 0.001;
             parameters.m_isDigital = false;
             parameters.m_hitType = pandora::ECAL;
             parameters.m_hitRegion = SINGLE_REGION;
@@ -154,9 +163,6 @@ pandora::StatusCode PrepareCaloHitsAlgorithm::Run()
 StatusCode PrepareCaloHitsAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
-        "NCaloHitsToMake", m_nCaloHitsToMake));
-
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
         "SetCurrentListToInputList", m_setCurrentListToInputList));
 
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
@@ -164,6 +170,12 @@ StatusCode PrepareCaloHitsAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "GroupSideLength", m_groupSideLength));
+
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+        "EnergyThreshold", m_energyThreshold));
+
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+        "TimeThreshold", m_timeThreshold));
 
     return STATUS_CODE_SUCCESS;
 }

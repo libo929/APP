@@ -2,7 +2,7 @@
 
 <pandora>
     <!-- GLOBAL SETTINGS -->
-    <IsMonitoringEnabled>false</IsMonitoringEnabled>
+    <IsMonitoringEnabled>true</IsMonitoringEnabled>
     <ShouldDisplayAlgorithmInfo>true</ShouldDisplayAlgorithmInfo>
 
     <!-- PLUGIN SETTINGS -->
@@ -19,17 +19,49 @@
 
     <!-- ALGORITHM SETTINGS -->
     <algorithm type="PrepareCaloHits">
-        <NCaloHitsToMake>100</NCaloHitsToMake>
+		<EnergyThreshold> 0. </EnergyThreshold>
+		<TimeThreshold> 0. </TimeThreshold>
         <SetCurrentListToInputList>true</SetCurrentListToInputList>
     </algorithm>
 
+<comment>
+    <algorithm type="DisplayListsExample">
+        <DisplayCurrentCaloHits>true</DisplayCurrentCaloHits>
+		<EnergyThreshold> 0. </EnergyThreshold>
+		<TimeThreshold> 100. </TimeThreshold>
+    </algorithm>
+
+    <algorithm type="DisplayListsExample">
+        <DisplayCurrentCaloHits>true</DisplayCurrentCaloHits>
+		<EnergyThreshold> 0.003 </EnergyThreshold>
+		<TimeThreshold> 45. </TimeThreshold>
+    </algorithm>
+
+	<algorithm type="VisualMonitoring">
+        <ShowCurrentConnectors>true</ShowCurrentConnectors>
+        <ConnectorLevel>Clusters</ConnectorLevel>
+        <ShowCurrentMCParticles>false</ShowCurrentMCParticles>
+        <ShowCurrentCaloHits>true</ShowCurrentCaloHits>
+        <ShowCurrentTracks>false</ShowCurrentTracks>
+        <ShowCurrentClusters>false</ShowCurrentClusters>
+        <ShowCurrentPfos>false</ShowCurrentPfos>
+        <ShowCurrentVertices>false</ShowCurrentVertices>
+        <HitColors>iterate</HitColors>
+        <DisplayEvent>true</DisplayEvent>
+        <ShowDetector>true</ShowDetector>
+        <DetectorView>""</DetectorView>
+        <ShowOnlyAvailable>true</ShowOnlyAvailable>
+        <ShowAssociatedTracks>true</ShowAssociatedTracks>
+    </algorithm>
+</comment>
+	    
 	<algorithm type="CaloHitPreparation"/>
 
-    <!--algorithm type="AccessListsExample"/-->
-
-	<algorithm type="ArborClustering" description="ClusterFormation">
+	<algorithm type="APRILClustering" description="ClusterFormation">
+	    <UseAsIndependent> true </UseAsIndependent>
 	    <ConnectionTools>
            <!-- connector seeding in ECAL -->
+<comment>
            <tool type="ConnectorSeeding">
              <CaloHitCollection> 1 </CaloHitCollection>
              <HitSearchRange> 30. </HitSearchRange>
@@ -51,9 +83,45 @@
              <BackwardReferenceDirectionDepth> 1 </BackwardReferenceDirectionDepth>
              <ForwardReferenceDirectionDepth> 1 </ForwardReferenceDirectionDepth>
            </tool>
+</comment>
+           <tool type="ConnectorSeeding">
+             <CaloHitCollection> 1 </CaloHitCollection>
+             <HitSearchRange> 50. </HitSearchRange>
+             <MaxPseudoLayerConnection> 3 </MaxPseudoLayerConnection>
+             <MaxCollectorLength> 40. </MaxCollectorLength>
+             <MaxTransverseDistanceFine> 40. </MaxTransverseDistanceFine>
+             <MaxTransverseDistanceCoarse> 40. </MaxTransverseDistanceCoarse> <!-- 4 * 10 mm -->
+             <MaxConnectionAngleFine> 2. </MaxConnectionAngleFine>
+             <MaxConnectionAngleCoarse> 2. </MaxConnectionAngleCoarse>
+             <ShouldUseIsolatedHits> true </ShouldUseIsolatedHits>
+             <ShouldDiscriminateConnectedHits> false </ShouldDiscriminateConnectedHits>
+             <ConnectorCreationStage> 2 </ConnectorCreationStage>
+           </tool>
+           <tool type="ConnectorCleaning">
+             <OrderParameterAnglePower> 1 </OrderParameterAnglePower>
+             <OrderParameterDistancePower> 7 </OrderParameterDistancePower>
+             <BackwardConnectorWeight> 2. </BackwardConnectorWeight>
+             <ForwardConnectorWeight> 1. </ForwardConnectorWeight>
+             <BackwardReferenceDirectionDepth> 1 </BackwardReferenceDirectionDepth>
+             <ForwardReferenceDirectionDepth> 1 </ForwardReferenceDirectionDepth>
+           </tool>
 	    </ConnectionTools>
 	</algorithm>
+
+	<algorithm type="ClosebySeedMerging">                                                                     
+	    <MergeHCalSeedClusters>false</MergeHCalSeedClusters>                                                    
+	</algorithm>  
+
+    <algorithm type="WriteTreeExample">
+        <FileName>test.root</FileName>
+        <TreeName>testTree</TreeName>
+    </algorithm>
+
+
 <comment>
+    <algorithm type="DisplayListsExample">
+        <DisplayCurrentClusters>true</DisplayCurrentClusters>
+    </algorithm>
 </comment>
 
 

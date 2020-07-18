@@ -23,7 +23,9 @@ DisplayListsAlgorithm::DisplayListsAlgorithm() :
     m_displayCurrentMCParticles(false),
     m_displayCurrentClusters(false),
     m_displayCurrentVertices(false),
-    m_displayCurrentPfos(false)
+    m_displayCurrentPfos(false),
+	m_energyThreshold(0.),
+	m_timeThreshold(1000.)
 {
 }
 
@@ -42,8 +44,18 @@ StatusCode DisplayListsAlgorithm::Run()
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentList(*this, pCaloHitList));
         std::cout << "---" << pCaloHitList->size() << " calo hits in current list " << std::endl;
 
+		CaloHitList selectedHitList;
+
+		for(auto hit : *pCaloHitList)
+		{
+			if(hit->GetInputEnergy() < m_energyThreshold || hit->GetTime() > m_timeThreshold) continue;
+			selectedHitList.push_back(hit);
+		}
+
+		std::cout << "selected hit: " << selectedHitList.size() << std::endl;
+
         // Display additional properties for any example user-defined calo hits
-        for (const CaloHit *const pCaloHit : *pCaloHitList)
+        for (const CaloHit *const pCaloHit : selectedHitList)
         {
             const ExampleCaloHit *const pExampleCaloHit(dynamic_cast<const ExampleCaloHit*>(pCaloHit));
 
@@ -53,7 +65,22 @@ StatusCode DisplayListsAlgorithm::Run()
             }
         }
 
-        PANDORA_MONITORING_API(VisualizeCaloHits(this->GetPandora(), pCaloHitList, "CurrentCaloHits", GRAY));
+		OrderedCaloHitList orderedCaloHitList;
+		orderedCaloHitList.Add(selectedHitList);
+		//std::cout << "OrderedCaloHitList size: " << orderedCaloHitList.size() << std::endl;
+
+		for(auto& iter : orderedCaloHitList)
+		{
+			//std::cout << "layer: " << iter.first << std::endl;
+			auto& caloHitListAtLayer = iter.second;
+
+            //PANDORA_MONITORING_API(VisualizeCaloHits(this->GetPandora(), pCaloHitList, "CurrentCaloHits", GRAY));
+			std::string caloListName("CurrentCaloHits@layer_");
+			caloListName += std::to_string(iter.first);
+
+            PANDORA_MONITORING_API(VisualizeCaloHits(this->GetPandora(), caloHitListAtLayer, caloListName.c_str(), 
+						::AUTOITER));
+	    }
     }
 
     if (m_displayCurrentTracks)
@@ -83,7 +110,7 @@ StatusCode DisplayListsAlgorithm::Run()
             std::cout << "------Cluster " << pCluster << ", nHits: " << pCluster->GetNCaloHits() << std::endl;
         }
 
-        PANDORA_MONITORING_API(VisualizeClusters(this->GetPandora(), pClusterList, "CurrentClusterList", RED));
+        PANDORA_MONITORING_API(VisualizeClusters(this->GetPandora(), pClusterList, "CurrentClusterList", AUTOITER));
     }
 
     if (m_displayCurrentVertices)
@@ -134,6 +161,12 @@ StatusCode DisplayListsAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "DisplayCurrentPfos", m_displayCurrentPfos));
+
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+        "EnergyThreshold", m_energyThreshold));
+
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+        "TimeThreshold", m_timeThreshold));
 
     return STATUS_CODE_SUCCESS;
 }

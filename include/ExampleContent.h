@@ -32,12 +32,12 @@
 #include "ExamplePlugins/ExamplePseudoLayerPlugin.h"
 
 // APRIL
-#include "ArborClustering/ArborClusteringAlgorithm.h"
-
-#include "ArborTools/ConnectorSeedingTool.h"
-#include "ArborTools/ConnectorCleaningTool.h"
-
-#include "ArborUtility/CaloHitPreparationAlgorithm.h"
+#include "APRILClustering/APRILClusteringAlgorithm.h"
+#include "APRILTopologicalAssociation/ClosebySeedMergingAlgorithm.h"
+#include "APRILTools/ConnectorSeedingTool.h"
+#include "APRILTools/ConnectorCleaningTool.h"
+#include "APRILUtility/CaloHitPreparationAlgorithm.h"
+#include "APRILMonitoring/VisualMonitoringAlgorithm.h"
 
 /**
  *  @brief  ExampleContent class
@@ -62,13 +62,15 @@ public:
         d("UseAlgorithmToolExample",                    example_content::UseAlgorithmToolAlgorithm::Factory)            \
         d("UsePluginsExample",                          example_content::UsePluginsAlgorithm::Factory)                  \
         d("WriteTreeExample",                           example_content::WriteTreeAlgorithm::Factory)                   \
-        d("ArborClustering",                            arbor_content::ArborClusteringAlgorithm::Factory)               \
-	    d("CaloHitPreparation",                         arbor_content::CaloHitPreparationAlgorithm::Factory)
+        d("VisualMonitoring",                           april_content::VisualMonitoringAlgorithm::Factory)              \
+        d("APRILClustering",                            april_content::APRILClusteringAlgorithm::Factory)               \
+	    d("ClosebySeedMerging",                         april_content::ClosebySeedMergingAlgorithm::Factory)            \
+	    d("CaloHitPreparation",                         april_content::CaloHitPreparationAlgorithm::Factory)
 
     #define EXAMPLE_ALGORITHM_TOOL_LIST(d)                                                                              \
         d("AlgorithmToolExample",                       example_content::ExampleAlgorithmTool::Factory)                 \
-        d("ConnectorSeeding",                           arbor_content::ConnectorSeedingTool::Factory)                   \
-        d("ConnectorCleaning",                          arbor_content::ConnectorCleaningTool::Factory)
+        d("ConnectorSeeding",                           april_content::ConnectorSeedingTool::Factory)                   \
+        d("ConnectorCleaning",                          april_content::ConnectorCleaningTool::Factory)
 
     #define EXAMPLE_ENERGY_CORRECTION_LIST(d)                                                                           \
         d("EnergyCorrectionExample", pandora::HADRONIC, example_content::ExampleEnergyCorrectionPlugin)

@@ -9,7 +9,7 @@
 #define PREPARE_CALOHITS_ALGORITHM 1
 
 #include "Pandora/Algorithm.h"
-#include "ArborObjects/CaloHit.h"
+#include "APRILObjects/CaloHit.h"
 
 #include <random>
 
@@ -40,15 +40,16 @@ private:
     pandora::StatusCode Run();
     pandora::StatusCode ReadSettings(const pandora::TiXmlHandle xmlHandle);
 
-    unsigned int                m_nCaloHitsToMake;                  ///< The number of new calo hits to make
     bool                        m_setCurrentListToInputList;        ///< Whether to return calo hit list to the input list after hit creation
 
     float                       m_worldSideLength;                  ///< The world volume cube side length
     float                       m_groupSideLength;                  ///< The group volume cube side length
+	float                       m_energyThreshold;
+	float                       m_timeThreshold;
 
     std::default_random_engine  m_randomEngine;                     ///< The engine for random number generation
 
-	static arbor_content::CaloHitFactory   m_pCaloHitFactory;
+	static april_content::CaloHitFactory   m_pCaloHitFactory;
     static int                  m_nEvent;
 };
 
