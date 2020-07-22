@@ -107,10 +107,13 @@ StatusCode DisplayListsAlgorithm::Run()
 
         for (const Cluster *const pCluster : *pClusterList)
         {
-            std::cout << "------Cluster " << pCluster << ", nHits: " << pCluster->GetNCaloHits() << std::endl;
+            std::cout << "------Cluster " << pCluster
+				      << ", energy: " << pCluster->GetElectromagneticEnergy() 
+				      << ", nHits: " << pCluster->GetNCaloHits() << std::endl;
         }
 
         PANDORA_MONITORING_API(VisualizeClusters(this->GetPandora(), pClusterList, "CurrentClusterList", AUTOITER));
+        //PANDORA_MONITORING_API(VisualizeClusters(this->GetPandora(), pClusterList, "CurrentClusterList", ::AUTOENERGY));
     }
 
     if (m_displayCurrentVertices)
