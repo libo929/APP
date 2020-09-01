@@ -10,6 +10,9 @@
 
 #include "ExampleAlgorithms/WriteTreeAlgorithm.h"
 
+#include "APRILObjects/Cluster.h"
+#include "APRILHelpers/ClusterHelper.h"
+
 using namespace pandora;
 
 namespace example_content
@@ -39,13 +42,30 @@ StatusCode WriteTreeAlgorithm::Run()
 
     int nClusters(0);
     int nMainClusters(0);
-    FloatVector clusterEnergies;
+
     float mainClustersEnergy(0.);
     float eventEnergy(0.);
+
+    FloatVector clusterEnergies;
+
+    FloatVector clusterCOGX;
+    FloatVector clusterCOGY;
+    FloatVector clusterCOGZ;
 
     for (const Cluster *const pCluster : *pClusterList)
     {
 		float clusterEnergy = pCluster->GetHadronicEnergy();
+		const april_content::APRILCluster *const pAPRILCluster 
+			  = dynamic_cast<const april_content::APRILCluster *const>(pCluster);
+
+		pandora::CartesianVector clusterCentroid(0., 0., 0.);
+		april_content::ClusterHelper::GetCentroid(pAPRILCluster, clusterCentroid);
+
+		//std::cout << clusterCentroid.GetX() << ", " << clusterCentroid.GetY() << ", " << clusterCentroid.GetZ() << std::endl;
+
+		clusterCOGX.push_back(clusterCentroid.GetX());
+		clusterCOGY.push_back(clusterCentroid.GetY());
+		clusterCOGZ.push_back(clusterCentroid.GetZ());
 
         clusterEnergies.push_back(clusterEnergy);
 		eventEnergy += clusterEnergy;
@@ -61,9 +81,15 @@ StatusCode WriteTreeAlgorithm::Run()
 
     PANDORA_MONITORING_API(SetTreeVariable(this->GetPandora(), m_treeName, "nClusters",          nClusters));
     PANDORA_MONITORING_API(SetTreeVariable(this->GetPandora(), m_treeName, "nMainClusters",      nMainClusters));
-    PANDORA_MONITORING_API(SetTreeVariable(this->GetPandora(), m_treeName, "clusterEnergies",    &clusterEnergies));
     PANDORA_MONITORING_API(SetTreeVariable(this->GetPandora(), m_treeName, "mainClustersEnergy", mainClustersEnergy));
     PANDORA_MONITORING_API(SetTreeVariable(this->GetPandora(), m_treeName, "eventEnergy",        eventEnergy));
+
+    PANDORA_MONITORING_API(SetTreeVariable(this->GetPandora(), m_treeName, "clusterEnergies",    &clusterEnergies));
+
+    PANDORA_MONITORING_API(SetTreeVariable(this->GetPandora(), m_treeName, "clustersCOGX",       &clusterCOGX));
+    PANDORA_MONITORING_API(SetTreeVariable(this->GetPandora(), m_treeName, "clustersCOGY",       &clusterCOGY));
+    PANDORA_MONITORING_API(SetTreeVariable(this->GetPandora(), m_treeName, "clustersCOGZ",       &clusterCOGZ));
+
     PANDORA_MONITORING_API(FillTree(this->GetPandora(), m_treeName));
 
     return STATUS_CODE_SUCCESS;
