@@ -45,24 +45,31 @@ pandora::StatusCode PrepareCaloHitsAlgorithm::Run()
 	int evtIndex;
 	int hitSize;
 
-	std::vector<int>* cellVecX = new std::vector<int>;
-	std::vector<int>* cellVecY = new std::vector<int>;
-	std::vector<int>* cellVecZ = new std::vector<int>;
+	//std::vector<int>* cellVecX = 0;
+	//std::vector<int>* cellVecY = 0;
+	//std::vector<int>* cellVecZ = 0;
 
-	std::vector<float>* posVecX = new std::vector<float>;
-	std::vector<float>* posVecY = new std::vector<float>;
-	std::vector<float>* posVecZ = new std::vector<float>;
+	std::vector<float>* posVecX = 0;
+	std::vector<float>* posVecY = 0;
+	std::vector<float>* posVecZ = 0;
 
-	std::vector<float>* energyVec = new std::vector<float>;
-	std::vector<float>* timeVec = new std::vector<float>;
+	std::vector<float>* energyVec = 0;
+	std::vector<float>* timeVec = 0;
+
+#if 0
+	std::vector<int>* fromIDVec  = new std::vector<int>;
+	std::vector<float>* fromEVec = new std::vector<float>;
+#endif
 
 	/////////////////////////////////////////////////////
 	inTree->SetBranchAddress("evtIndex",  &evtIndex);
 	inTree->SetBranchAddress("hitSize",   &hitSize);
 
+#if 0
 	inTree->SetBranchAddress("cellVecX",  &cellVecX);
 	inTree->SetBranchAddress("cellVecY",  &cellVecY);
 	inTree->SetBranchAddress("cellVecZ",  &cellVecZ);
+#endif
 
 	inTree->SetBranchAddress("posVecX",   &posVecX);
 	inTree->SetBranchAddress("posVecY",   &posVecY);
@@ -71,17 +78,18 @@ pandora::StatusCode PrepareCaloHitsAlgorithm::Run()
 	inTree->SetBranchAddress("energyVec", &energyVec);
 	inTree->SetBranchAddress("timeVec",   &timeVec);
 
-    //ExampleCaloHitFactory exampleCaloHitFactory;
-    std::uniform_real_distribution<float> randomDistribution(0.f, 1.f);
+#if 0
+	inTree->SetBranchAddress("fromIDVec",  &fromIDVec);
+	inTree->SetBranchAddress("fromIDEVec", &fromEVec);
+#endif
 
-	//for(unsigned int i= 0; i < 1; ++i)
 
 	//for(unsigned int i= 0; i < inTree->GetEntries(); ++i)
 	{
 		inTree->GetEntry(m_nEvent++);
 
-#if 0
-		std::cout << "evtIndex: " << evtIndex << ", hit size: " << hitSize << 
+#if 1
+		std::cout << " ~~~~~~~~~~~~~~~~~~****************** evtIndex: " << evtIndex << ", hit size: " << hitSize << 
 			", timeVec size: " << timeVec->size() << std::endl;
 #endif
 
@@ -94,10 +102,12 @@ pandora::StatusCode PrepareCaloHitsAlgorithm::Run()
 				      << ", time: " << timeVec->at(ihit) << std::endl;
 #endif
 
+			//if(int(posVecZ->at(ihit)/5.5)>=2) continue;
+
 			if(energyVec->at(ihit) < m_energyThreshold) continue;
 			if(timeVec->at(ihit) < m_timeThreshold) continue;
 
-            const CartesianVector hitPosition( posVecX->at(ihit), posVecY->at(ihit), posVecZ->at(ihit) ); 
+            const CartesianVector hitPosition( posVecX->at(ihit), posVecY->at(ihit), posVecZ->at(ihit)+12520. ); 
 
             // Mainly dummy parameters
             ExampleCaloHitParameters parameters;
@@ -115,19 +125,35 @@ pandora::StatusCode PrepareCaloHitsAlgorithm::Run()
             parameters.m_cellSize1 = 9.f;
             parameters.m_cellThickness = 3.f;
 
+			//const float toGeV = 0.001;
+
+			float alpha = 0.06071;
+			float beta = 0.;
+			float hitE = energyVec->at(ihit) * alpha + beta;
+
+
             parameters.m_nCellRadiationLengths = 1.f;
             parameters.m_nCellInteractionLengths = 1.f;
             parameters.m_time = timeVec->at(ihit);
-            parameters.m_inputEnergy = energyVec->at(ihit) * 0.001; // to GeV
+            parameters.m_inputEnergy = hitE;
             parameters.m_mipEquivalentEnergy = 1.f;
-            parameters.m_electromagneticEnergy = energyVec->at(ihit) * 0.001;
-            parameters.m_hadronicEnergy = energyVec->at(ihit) * 0.001;
+            parameters.m_electromagneticEnergy = hitE;
+			//std::cout << __LINE__ << ", " << hitE  << std::endl;
+#if 0
+            //parameters.m_hadronicEnergy = fromIDVec->at(ihit);
+#endif
+            parameters.m_hadronicEnergy = hitE;
             parameters.m_isDigital = false;
             parameters.m_hitType = pandora::ECAL;
             parameters.m_hitRegion = SINGLE_REGION;
-            parameters.m_layer = cellVecZ->at(ihit);
+            parameters.m_layer = int(posVecZ->at(ihit)/5.5);
             parameters.m_isInOuterSamplingLayer = false;
             parameters.m_pParentAddress = (void*)(static_cast<uintptr_t>(ihit));
+
+			//std::cout << " --- " << posVecX->at(ihit) << " " << posVecY->at(ihit) << " " << 12520 + posVecZ->at(ihit) << std::endl;
+
+			//parameters.m_fromID = fromIDVec->at(ihit);
+			//parameters.m_fromE = fromEVec->at(ihit);
 
             const CaloHit *pCaloHit(nullptr);
             PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::CaloHit::Create(*this, parameters, pCaloHit, m_pCaloHitFactory));
@@ -136,16 +162,10 @@ pandora::StatusCode PrepareCaloHitsAlgorithm::Run()
 		}
 	}
 
-	delete cellVecX;
-	delete cellVecY;
-	delete cellVecZ;
-
-	delete posVecX;
-	delete posVecY;
-	delete posVecZ;
-
-	delete energyVec;
-	delete timeVec;
+#if 0
+	delete fromIDVec;
+	delete fromEVec;
+#endif
 
 	delete f;
 #endif
