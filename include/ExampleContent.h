@@ -34,10 +34,15 @@
 // APRIL
 #include "APRILClustering/APRILClusteringAlgorithm.h"
 #include "APRILTopologicalAssociation/ClosebySeedMergingAlgorithm.h"
+#include "APRILTopologicalAssociation/ClustersMergingAlgorithm.h"
+#include "APRILTopologicalAssociation/NearbyFragmentsMergingAlgorithm.h"
 #include "APRILTools/ConnectorSeedingTool.h"
 #include "APRILTools/ConnectorCleaningTool.h"
+#include "APRILTools/NearbyHitsConnectingTool.h"
 #include "APRILUtility/CaloHitPreparationAlgorithm.h"
+#include "APRILUtility/NearbyHitRecoveryAlgorithm.h"
 #include "APRILMonitoring/VisualMonitoringAlgorithm.h"
+
 
 /**
  *  @brief  ExampleContent class
@@ -65,11 +70,15 @@ public:
         d("VisualMonitoring",                           april_content::VisualMonitoringAlgorithm::Factory)              \
         d("APRILClustering",                            april_content::APRILClusteringAlgorithm::Factory)               \
 	    d("ClosebySeedMerging",                         april_content::ClosebySeedMergingAlgorithm::Factory)            \
-	    d("CaloHitPreparation",                         april_content::CaloHitPreparationAlgorithm::Factory)
+	    d("CaloHitPreparation",                         april_content::CaloHitPreparationAlgorithm::Factory)            \
+	    d("ClustersMerging",                            april_content::ClustersMergingAlgorithm::Factory) \
+	    d("NearbyHitRecovery",                          april_content::NearbyHitRecoveryAlgorithm::Factory) \
+	    d("NearbyFragmentsMerging",                     april_content::NearbyFragmentsMergingAlgorithm::Factory)
 
     #define EXAMPLE_ALGORITHM_TOOL_LIST(d)                                                                              \
         d("AlgorithmToolExample",                       example_content::ExampleAlgorithmTool::Factory)                 \
         d("ConnectorSeeding",                           april_content::ConnectorSeedingTool::Factory)                   \
+	    d("NearbyHitsConnecting",                       april_content::NearbyHitsConnectingTool::Factory) \
         d("ConnectorCleaning",                          april_content::ConnectorCleaningTool::Factory)
 
     #define EXAMPLE_ENERGY_CORRECTION_LIST(d)                                                                           \
