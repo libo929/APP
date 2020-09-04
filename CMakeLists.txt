@@ -51,6 +51,16 @@ include_directories(${ROOT_INCLUDE_DIRS})
 link_libraries(${ROOT_LIBRARIES})
 add_definitions(${ROOT_DEFINITIONS})
 
+find_package( mlpack REQUIRED )
+include_directories( SYSTEM ${mlpack_INCLUDE_DIRS} )
+link_libraries( ${mlpack_LIBRARIES} )
+
+find_package( Boost REQUIRED )
+include_directories( SYSTEM ${Boost_INCLUDE_DIRS} )
+
+find_package( Armadillo REQUIRED )
+include_directories( SYSTEM ${ARMADILLO_INCLUDE_DIRS} )
+
 find_package( APRILContent REQUIRED )
 if (APRILContent_FOUND)
 	list(APPEND CMAKE_MODULE_PATH ${APRILContent_ROOT}/cmake)
