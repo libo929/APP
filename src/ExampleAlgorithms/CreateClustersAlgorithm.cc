@@ -26,38 +26,50 @@ CreateClustersAlgorithm::CreateClustersAlgorithm() :
 
 StatusCode CreateClustersAlgorithm::Run()
 {
-    // Create clusters using calo hits in the current list as the building blocks.
     const CaloHitList *pCaloHitList(nullptr);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentList(*this, pCaloHitList));
 
-    // Algorithms must either create a temporary list for newly created clusters, or ask to run a daughter clustering algorithm
-    // (temporary list, owned by parent algorithm is then created automatically for you). Any Clusters remaining in a temporary
-    // list at the end of the algorithm will be deleted, so all desired clusters must be saved before the algorithm ends.
     const ClusterList *pTemporaryList(nullptr);
     std::string temporaryListName;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::CreateTemporaryListAndSetCurrent(*this, pTemporaryList, temporaryListName));
 
-    // Here we use the first hit in an ordered calo hit vector to seed a new clusters. Subsequent hits are then either added
-    // to the closest seed cluster (provided it is within a specified maximum distance), or used to create an additional seed cluster.
+	std::map<int, CaloHitList> hitMap;
+
     for (const CaloHit *const pCaloHit : *pCaloHitList)
     {
         // Once a calo hit has been added to a cluster, it is flagged as unavailable.
         if (!PandoraContentApi::IsAvailable(*this, pCaloHit))
             continue;
 
-        try
-        {
-            const Cluster *const pCluster(ExampleHelper::FindClosestCluster(pCaloHit, pTemporaryList, m_maxClusterHitDistance));
-            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::AddToCluster(*this, pCluster, pCaloHit));
-        }
-        catch (StatusCodeException &)
-        {
-            const Cluster *pCluster(nullptr);
-            PandoraContentApi::Cluster::Parameters parameters;
-            parameters.m_caloHitList.push_back(pCaloHit);
-            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::Cluster::Create(*this, parameters, pCluster));
-        }
+		//std::cout << "    ---  hit: " << pCaloHit->GetHadronicEnergy() << std::endl;
+
+		// ad hoc: energy is for mc id
+		int mcID = int(pCaloHit->GetHadronicEnergy());
+
+		if(hitMap.find(mcID) == hitMap.end())
+		{
+			CaloHitList  caloHitList;
+			caloHitList.push_back(pCaloHit);
+			hitMap[mcID] = caloHitList;
+		}
+		else
+		{
+			hitMap[mcID].push_back(pCaloHit);
+		}
     }
+
+	std::cout << "hit map size: " << hitMap.size() << std::endl;
+
+	for(const auto& hitMapIter : hitMap)
+	{
+		const auto& caloHitList = hitMapIter.second; 
+        const Cluster *pCluster(nullptr);
+        PandoraContentApi::Cluster::Parameters parameters;
+        parameters.m_caloHitList = caloHitList;
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::Cluster::Create(*this, parameters, pCluster));
+
+		std::cout << "cluster energy: " << pCluster->GetElectromagneticEnergy() << ", from mc id: " << hitMapIter.first << std::endl;
+	}
 
     // Choose to save the temporary clusters under a specified name and to set the cluster list to be the current list.
     if (!pTemporaryList->empty())
