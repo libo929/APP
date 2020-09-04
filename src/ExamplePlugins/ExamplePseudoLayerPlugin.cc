@@ -30,7 +30,9 @@ unsigned int ExamplePseudoLayerPlugin::GetPseudoLayer(const CartesianVector &pos
     // group together positions of equivalent depth in the detector. For fixed target collisions, the layer structure will typically
     // represent a binning of distance from the target.
 
-	return static_cast<unsigned int>( (positionVector.GetZ() - 12520. + 4.)/5.5 );  
+	//return static_cast<unsigned int>( (positionVector.GetZ() - 12520. + 4.)/5.5 );  
+	//std::cout << " ****** " << static_cast<unsigned int> ( positionVector.GetZ()/5.5 ) << std::endl;
+	return static_cast<unsigned int> ( (positionVector.GetZ()-12520.)/5.5 + 1);  
 	//cellID.Z() * 5.5 - 4.
     //return static_cast<unsigned int>((m_zOffset + positionVector.GetZ()) / m_zPitch);
     //return static_cast<unsigned int>((m_zOffset + positionVector.GetZ()) / m_zPitch);
