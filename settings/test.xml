@@ -25,12 +25,12 @@
     </algorithm>
 
 
-<comment>
     <algorithm type="DisplayListsExample">
         <DisplayCurrentCaloHits>true</DisplayCurrentCaloHits>
 		<EnergyThreshold> 0. </EnergyThreshold>
 		<TimeThreshold> 1000. </TimeThreshold>
     </algorithm>
+<comment>
 </comment>
 
 
@@ -125,22 +125,22 @@
 	</algorithm>
 
 
-<comment>
     <algorithm type="WriteTreeExample">
         <FileName>test.root</FileName>
         <TreeName>testTree</TreeName>
     </algorithm>
+<comment>
 </comment>
 
 
 
-<comment>
 	<algorithm type="VisualMonitoring">
         <DisplayCurrentClusters>true</DisplayCurrentClusters>
         <DisplayCurrentConnectors>true</DisplayCurrentConnectors>
 		<ConnectorLevel>Clusters</ConnectorLevel>
 		<DarkBackground>false</DarkBackground>
 	</algorithm>
+<comment>
 </comment>
 
 
