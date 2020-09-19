@@ -51,10 +51,6 @@ include_directories(${ROOT_INCLUDE_DIRS})
 link_libraries(${ROOT_LIBRARIES})
 add_definitions(${ROOT_DEFINITIONS})
 
-find_package( mlpack REQUIRED )
-include_directories( SYSTEM ${mlpack_INCLUDE_DIRS} )
-link_libraries( ${mlpack_LIBRARIES} )
-
 find_package( Boost REQUIRED )
 include_directories( SYSTEM ${Boost_INCLUDE_DIRS} )
 
@@ -67,6 +63,10 @@ if (APRILContent_FOUND)
 else()
 	message(FATAL_ERROR "APRILContent is not found.")
 endif()
+
+find_package( mlpack REQUIRED )
+include_directories( SYSTEM ${mlpack_INCLUDE_DIRS} )
+link_libraries( ${mlpack_LIBRARIES} )
 
 include_directories(${APRILContent_INCLUDE_DIRS})
 link_libraries(${APRILContent_LIBRARIES})
