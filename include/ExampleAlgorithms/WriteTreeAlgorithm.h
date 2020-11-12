@@ -39,6 +39,8 @@ private:
 
     std::string     m_fileName;         ///< The name of the output file
     std::string     m_treeName;         ///< The name of the output tree
+
+	static int      m_evtNumber;
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------

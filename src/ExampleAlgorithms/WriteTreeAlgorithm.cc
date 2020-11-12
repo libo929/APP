@@ -18,6 +18,8 @@ using namespace pandora;
 namespace example_content
 {
 
+int WriteTreeAlgorithm::m_evtNumber = 0;
+
 WriteTreeAlgorithm::~WriteTreeAlgorithm()
 {
     try
@@ -79,6 +81,7 @@ StatusCode WriteTreeAlgorithm::Run()
         ++nClusters;
     }
 
+    PANDORA_MONITORING_API(SetTreeVariable(this->GetPandora(), m_treeName, "evtNumber",          m_evtNumber));
     PANDORA_MONITORING_API(SetTreeVariable(this->GetPandora(), m_treeName, "nClusters",          nClusters));
     PANDORA_MONITORING_API(SetTreeVariable(this->GetPandora(), m_treeName, "nMainClusters",      nMainClusters));
     PANDORA_MONITORING_API(SetTreeVariable(this->GetPandora(), m_treeName, "mainClustersEnergy", mainClustersEnergy));
@@ -91,6 +94,8 @@ StatusCode WriteTreeAlgorithm::Run()
     PANDORA_MONITORING_API(SetTreeVariable(this->GetPandora(), m_treeName, "clustersCOGZ",       &clusterCOGZ));
 
     PANDORA_MONITORING_API(FillTree(this->GetPandora(), m_treeName));
+
+	++m_evtNumber;
 
     return STATUS_CODE_SUCCESS;
 }

@@ -77,7 +77,7 @@ pandora::StatusCode GenerateExampleHits(const pandora::Pandora &pandora, const P
 
 int main(int argc, char *argv[])
 {
-	std::cout << " This is CaloRec... " << std::endl;
+	//std::cout << " This is CaloRec... " << std::endl;
 
     try
     {
