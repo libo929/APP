@@ -48,6 +48,7 @@ private:
 	float                       m_timeThreshold;
 
     std::default_random_engine  m_randomEngine;                     ///< The engine for random number generation
+	std::string     m_inputFileName;
 
 	static april_content::CaloHitFactory   m_pCaloHitFactory;
     static int                  m_nEvent;

@@ -39,7 +39,7 @@ PrepareCaloHitsAlgorithm::PrepareCaloHitsAlgorithm() :
 pandora::StatusCode PrepareCaloHitsAlgorithm::Run()
 {
 #if 1
-	TFile* f = new TFile("calo.root");
+	TFile* f = new TFile(m_inputFileName.c_str());
 	TTree* inTree = (TTree*)gDirectory->Get("ce");
 
 	int evtIndex;
@@ -197,6 +197,9 @@ StatusCode PrepareCaloHitsAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "TimeThreshold", m_timeThreshold));
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
+        "InputFileName", m_inputFileName));
 
     return STATUS_CODE_SUCCESS;
 }

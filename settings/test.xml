@@ -21,6 +21,7 @@
 		<EnergyThreshold> 0.08 </EnergyThreshold>
 		<TimeThreshold> 0. </TimeThreshold>
         <SetCurrentListToInputList>true</SetCurrentListToInputList>
+		<InputFileName> calo.root </InputFileName>
     </algorithm>
 
 
