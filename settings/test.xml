@@ -25,13 +25,13 @@
     </algorithm>
 
 
+<comment>
     <algorithm type="DisplayListsExample">
         <DisplayCurrentCaloHits>true</DisplayCurrentCaloHits>
         <DisplayCurrentPfos>false</DisplayCurrentPfos>
 		<EnergyThreshold> 0. </EnergyThreshold>
 		<TimeThreshold> 1000. </TimeThreshold>
     </algorithm>
-<comment>
 </comment>
 
 	<algorithm type="CaloHitPreparation"/>
@@ -133,6 +133,7 @@
 <comment>
 </comment>
 
+<comment>
 	<algorithm type="VisualMonitoring">
         <DisplayCurrentClusters>true</DisplayCurrentClusters>
         <DisplayCurrentConnectors>true</DisplayCurrentConnectors>
@@ -141,7 +142,6 @@
 		<DarkBackground>false</DarkBackground>
 	    <HitColors>iterate</HitColors>
 	</algorithm>
-<comment>
 </comment>
 
 
