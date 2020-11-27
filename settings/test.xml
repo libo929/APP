@@ -18,20 +18,20 @@
 
     <!-- ALGORITHM SETTINGS -->
     <algorithm type="PrepareCaloHits">
-		<EnergyThreshold> 0.08 </EnergyThreshold>
+		<EnergyThreshold> 0.000075 </EnergyThreshold>
 		<TimeThreshold> 0. </TimeThreshold>
         <SetCurrentListToInputList>true</SetCurrentListToInputList>
-		<InputFileName> calo.root </InputFileName>
+		<InputFileName> caloHits.root </InputFileName>
     </algorithm>
 
 
-<comment>
     <algorithm type="DisplayListsExample">
         <DisplayCurrentCaloHits>true</DisplayCurrentCaloHits>
         <DisplayCurrentPfos>false</DisplayCurrentPfos>
 		<EnergyThreshold> 0. </EnergyThreshold>
 		<TimeThreshold> 1000. </TimeThreshold>
     </algorithm>
+<comment>
 </comment>
 
 	<algorithm type="CaloHitPreparation"/>
@@ -43,20 +43,20 @@
            <!-- connector seeding in ECAL -->
            <tool type="ConnectorSeeding">
              <CaloHitCollection> 1 </CaloHitCollection>
-             <HitSearchRange> 30. </HitSearchRange>
+             <HitSearchRange> 40. </HitSearchRange>
              <MaxPseudoLayerConnection> 3 </MaxPseudoLayerConnection>
              <MaxCollectorLength> 40. </MaxCollectorLength>
-             <MaxTransverseDistanceFine> 40. </MaxTransverseDistanceFine>
-             <MaxTransverseDistanceCoarse> 60. </MaxTransverseDistanceCoarse> <!-- 4 * 10 mm -->
-             <MaxConnectionAngleFine> 1.5 </MaxConnectionAngleFine>
-             <MaxConnectionAngleCoarse> 0. </MaxConnectionAngleCoarse>
+             <MaxTransverseDistanceFine> 11.0 </MaxTransverseDistanceFine>
+             <MaxTransverseDistanceCoarse> 11.0 </MaxTransverseDistanceCoarse> <!-- 4 * 10 mm -->
+             <MaxConnectionAngleFine> 1.0 </MaxConnectionAngleFine>
+             <MaxConnectionAngleCoarse> 1.0 </MaxConnectionAngleCoarse>
              <ShouldUseIsolatedHits> true </ShouldUseIsolatedHits>
              <ShouldDiscriminateConnectedHits> false </ShouldDiscriminateConnectedHits>
              <ConnectorCreationStage> 1 </ConnectorCreationStage>
            </tool>
            <tool type="ConnectorCleaning">
              <OrderParameterAnglePower> 1 </OrderParameterAnglePower>
-             <OrderParameterDistancePower> 7 </OrderParameterDistancePower>
+             <OrderParameterDistancePower> 2 </OrderParameterDistancePower>
              <BackwardConnectorWeight> 2. </BackwardConnectorWeight>
              <ForwardConnectorWeight> 1. </ForwardConnectorWeight>
              <BackwardReferenceDirectionDepth> 1 </BackwardReferenceDirectionDepth>
@@ -75,6 +75,7 @@
 	    <HitColors>iterate</HitColors>
 	</algorithm>
 </comment>
+
 
     <algorithm type="NearbyHitRecovery">
       <NeighborHitsNumber> 5 </NeighborHitsNumber>
@@ -132,7 +133,6 @@
 <comment>
 </comment>
 
-<comment>
 	<algorithm type="VisualMonitoring">
         <DisplayCurrentClusters>true</DisplayCurrentClusters>
         <DisplayCurrentConnectors>true</DisplayCurrentConnectors>
@@ -141,6 +141,9 @@
 		<DarkBackground>false</DarkBackground>
 	    <HitColors>iterate</HitColors>
 	</algorithm>
+<comment>
 </comment>
+
+
 
 </pandora>

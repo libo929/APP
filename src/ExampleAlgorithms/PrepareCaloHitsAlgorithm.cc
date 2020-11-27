@@ -45,16 +45,16 @@ pandora::StatusCode PrepareCaloHitsAlgorithm::Run()
 	int evtIndex;
 	int hitSize;
 
-	//std::vector<int>* cellVecX = 0;
-	//std::vector<int>* cellVecY = 0;
-	//std::vector<int>* cellVecZ = 0;
+	std::vector<int>* cellVecX = 0;
+	std::vector<int>* cellVecY = 0;
+	std::vector<int>* cellVecZ = 0;
 
 	std::vector<float>* posVecX = 0;
 	std::vector<float>* posVecY = 0;
 	std::vector<float>* posVecZ = 0;
 
 	std::vector<float>* energyVec = 0;
-	std::vector<float>* timeVec = 0;
+	//std::vector<float>* timeVec = 0;
 
 #if 0
 	std::vector<int>* fromIDVec  = new std::vector<int>;
@@ -65,7 +65,7 @@ pandora::StatusCode PrepareCaloHitsAlgorithm::Run()
 	inTree->SetBranchAddress("evtIndex",  &evtIndex);
 	inTree->SetBranchAddress("hitSize",   &hitSize);
 
-#if 0
+#if 1
 	inTree->SetBranchAddress("cellVecX",  &cellVecX);
 	inTree->SetBranchAddress("cellVecY",  &cellVecY);
 	inTree->SetBranchAddress("cellVecZ",  &cellVecZ);
@@ -76,7 +76,7 @@ pandora::StatusCode PrepareCaloHitsAlgorithm::Run()
 	inTree->SetBranchAddress("posVecZ",   &posVecZ);
 
 	inTree->SetBranchAddress("energyVec", &energyVec);
-	inTree->SetBranchAddress("timeVec",   &timeVec);
+	//inTree->SetBranchAddress("timeVec",   &timeVec);
 
 #if 0
 	inTree->SetBranchAddress("fromIDVec",  &fromIDVec);
@@ -90,11 +90,11 @@ pandora::StatusCode PrepareCaloHitsAlgorithm::Run()
 		inTree->GetEntry(m_nEvent++);
 
 #if 1
-		std::cout << " ~~~~~~~~~~~~~~~~~~****************** evtIndex: " << evtIndex << ", hit size: " << hitSize << 
-			", timeVec size: " << timeVec->size() << std::endl;
+		std::cout << " ~~~~~~~~~~~~~~~~~~****************** evtIndex: " << evtIndex 
+			      << ", hit size: " << hitSize << std::endl;
 #endif
 
-		for(unsigned int ihit = 0; ihit < timeVec->size(); ++ ihit)
+		for(unsigned int ihit = 0; ihit < hitSize; ++ ihit)
 		{
 #if 0
 			std::cout << "  --- hit cell: " << cellVecX->at(ihit) << ", " << cellVecY->at(ihit) << ", " << cellVecZ->at(ihit)
@@ -106,9 +106,9 @@ pandora::StatusCode PrepareCaloHitsAlgorithm::Run()
 			//if(int(posVecZ->at(ihit)/5.5)>=2) continue;
 
 			if(energyVec->at(ihit) < m_energyThreshold) continue;
-			if(timeVec->at(ihit) < m_timeThreshold) continue;
+			//if(timeVec->at(ihit) < m_timeThreshold) continue;
 
-            const CartesianVector hitPosition( posVecX->at(ihit), posVecY->at(ihit), posVecZ->at(ihit)+12520. ); 
+            const CartesianVector hitPosition( posVecX->at(ihit), posVecY->at(ihit), posVecZ->at(ihit) ); 
 
             // Mainly dummy parameters
             ExampleCaloHitParameters parameters;
@@ -122,20 +122,20 @@ pandora::StatusCode PrepareCaloHitsAlgorithm::Run()
             //parameters.m_cellSize1 = 10.1f;
             //parameters.m_cellThickness = 5.5f;
 			// -> for display
-            parameters.m_cellSize0 = 9.f;
-            parameters.m_cellSize1 = 9.f;
+            parameters.m_cellSize0 = 5.f;
+            parameters.m_cellSize1 = 5.f;
             parameters.m_cellThickness = 3.f;
 
 			//const float toGeV = 0.001;
 
-			float alpha = 0.06071;
+			//float alpha = 0.06071;
+			float alpha = 57.292472;
 			float beta = 0.;
 			float hitE = energyVec->at(ihit) * alpha + beta;
 
-
             parameters.m_nCellRadiationLengths = 1.f;
             parameters.m_nCellInteractionLengths = 1.f;
-            parameters.m_time = timeVec->at(ihit);
+            parameters.m_time = 0.001;//timeVec->at(ihit);
             parameters.m_inputEnergy = hitE;
             parameters.m_mipEquivalentEnergy = 1.f;
             parameters.m_electromagneticEnergy = hitE;
@@ -143,11 +143,14 @@ pandora::StatusCode PrepareCaloHitsAlgorithm::Run()
 #if 0
             //parameters.m_hadronicEnergy = fromIDVec->at(ihit);
 #endif
+
+			//if(cellVecZ->at(ihit) > 2) continue;
+
             parameters.m_hadronicEnergy = hitE;
             parameters.m_isDigital = false;
             parameters.m_hitType = pandora::ECAL;
             parameters.m_hitRegion = SINGLE_REGION;
-            parameters.m_layer = int(posVecZ->at(ihit)/5.5);
+            parameters.m_layer = int(cellVecZ->at(ihit));
             parameters.m_isInOuterSamplingLayer = false;
             parameters.m_pParentAddress = (void*)(static_cast<uintptr_t>(ihit));
 
