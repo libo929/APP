@@ -34,53 +34,50 @@
 
    TH1F* hist = new TH1F("h", "hist", 100, 0., 0.3);
 
-   //for(unsigned int i = 0; i < 5; ++i)
    for(unsigned int i = 0; i < tree->GetEntries(); ++i)
    {
 	   tree->GetEntry(i);
 
-	   cout << "Evt: " << i << ", nClusters: " << nClusters << ", pos: " << clustersCOGX->size() << endl;
+	   //cout << "Evt: " << i << ", nClusters: " << nClusters << ", pos: " << clustersCOGX->size() << endl;
 	   if(clustersCOGX->size() <= 1) continue;
 
-	   std::vector<TVector3> clusterCentroids;
-	   std::vector<float> clusterEngs;
+	   std::map<float, TVector3> energyCOG;
 
 	   for(int iClu = 0; iClu < clustersCOGX->size(); ++iClu)
 	   {
-		   std::cout << "  --- " << clustersCOGX->at(iClu) << ", " << clustersCOGY->at(iClu) 
-			    << ", " << clustersCOGZ->at(iClu) << ", E: " << clusterEnergies->at(iClu) << std::endl;
+		   //std::cout << "  --- " << clustersCOGX->at(iClu) << ", " << clustersCOGY->at(iClu) 
+			//    << ", " << clustersCOGZ->at(iClu) << ", E: " << clusterEnergies->at(iClu) << std::endl;
 
 		   TVector3 clusterCentroid(clustersCOGX->at(iClu), clustersCOGY->at(iClu), clustersCOGZ->at(iClu));
 
-		   clusterCentroids.push_back(clusterCentroid);
-		   clusterEngs.push_back(clusterEnergies->at(iClu));
+		   energyCOG[clusterEnergies->at(iClu)] = clusterCentroid;
 	   }
 
-	   // loop for combination
-	   for(int iClu = 0; iClu < clusterCentroids.size(); ++iClu)
+	   if(energyCOG.size()<2) continue;
+
+	   // the cluster with the largest energy
+	   auto it1 = energyCOG.rbegin();
+
+	   float iClusterEnergy = it1->first;
+	   TVector3 iClusterCentroid = it1->second;
+
+	   if(iClusterEnergy<0.05) continue;
+
+	   // the cluster with the second largest energy
+	   ++it1;
+	   float jClusterEnergy = it1->first;
+	   TVector3 jClusterCentroid = it1->second;
+	   
+	   if(jClusterEnergy<0.05) continue;
+
+	   float theta = iClusterCentroid.Angle(jClusterCentroid);
+	   float mass2 = 2. * iClusterEnergy * jClusterEnergy * ( 1. - TMath::Cos(theta) );
+	   float mass = sqrt(mass2);
+
+	   if(mass > 0.02 && mass < 0.3)
 	   {
-		   TVector3 iClusterCentroid = clusterCentroids.at(iClu);
-		   float iClusterEnergy = clusterEngs.at(iClu);
-
-		   if(iClusterEnergy<0.05) continue;
-
-		   for(int jClu = iClu+1; jClu < clusterCentroids.size(); ++jClu)
-		   {
-			   TVector3 jClusterCentroid = clusterCentroids.at(jClu);
-			   float jClusterEnergy = clusterEngs.at(jClu);
-		   
-			   if(jClusterEnergy<0.05) continue;
-
-			   float theta = iClusterCentroid.Angle(jClusterCentroid);
-			   float mass2 = 2. * iClusterEnergy * jClusterEnergy * ( 1. - TMath::Cos(theta) );
-			   float mass = sqrt(mass2);
-
-			   if(mass > 0.02 && mass < 0.3)
-			   {
-				   std::cout << "cluE1: " << iClusterEnergy << ", cluE2: " << jClusterEnergy << ", mass: " << mass << std::endl;
-				   hist->Fill(mass);
-			   }
-		   }
+	       //std::cout << "cluE1: " << iClusterEnergy << ", cluE2: " << jClusterEnergy << ", mass: " << mass << std::endl;
+	       hist->Fill(mass);
 	   }
    }
 
