@@ -21,12 +21,6 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
     message(FATAL_ERROR "ExampleContent requires an out-of-source build.")
 endif()
 
-# project name
-if(NOT EXAMPLE_CONTENT_LIBRARY_NAME STREQUAL "ExamplePandoraContent")
-    set(EXAMPLE_CONTENT_LIBRARY_NAME "ExampleContent")
-endif()
-project(${EXAMPLE_CONTENT_LIBRARY_NAME})
-
 # project version
 set(${PROJECT_NAME}_VERSION_MAJOR 03)
 set(${PROJECT_NAME}_VERSION_MINOR 00)
@@ -87,7 +81,13 @@ message(${CMAKE_CURRENT_SOURCE_DIR})
 
 #-------------------------------------------------------------------------------------------------------------------------------------------
 # Low level settings - compiler etc
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -pedantic -Wno-long-long -Wno-sign-compare -fno-strict-aliasing -std=c++11 ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -pedantic -Wno-long-long -Wno-sign-compare -fno-strict-aliasing ${CMAKE_CXX_FLAGS}")
+
+option(BUILD_WITH_OPENMP "." ON)
+
+if(BUILD_WITH_OPENMP)
+	set(CMAKE_CXX_FLAGS "-fopenmp ${CMAKE_CXX_FLAGS}")
+endif()
 
 include(CheckCXXCompilerFlag)
 unset(COMPILER_SUPPORTS_CXX_FLAGS CACHE)
