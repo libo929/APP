@@ -8,6 +8,7 @@
 
 #include "TFile.h"
 #include "TTree.h"
+#include "TRandom.h"
 
 #include "Pandora/AlgorithmHeaders.h"
 #include "ExampleAlgorithms/PrepareCaloHitsAlgorithm.h"
@@ -85,7 +86,7 @@ pandora::StatusCode PrepareCaloHitsAlgorithm::Run()
 
 
 	//for(unsigned int i= 0; i < inTree->GetEntries(); ++i)
-	if(m_nEvent<inTree->GetEntries()) 
+	if(m_nEvent<inTree->GetEntries()-1) 
 	{
 		inTree->GetEntry(m_nEvent++);
 
@@ -126,12 +127,16 @@ pandora::StatusCode PrepareCaloHitsAlgorithm::Run()
             parameters.m_cellSize1 = 5.f;
             parameters.m_cellThickness = 3.f;
 
-			//const float toGeV = 0.001;
+			//float alpha = 29.8;
+			//float hitE = energyVec->at(ihit) * alpha;
 
-			float alpha = 29.8;
+			const float mipE = 3.6e-9;
+			const float alpha = 29.5;
+			double ne = energyVec->at(ihit) / mipE;
+			float hitE = gRandom->Poisson(ne) / ne * energyVec->at(ihit) * alpha;
+			//float hitE = ne/ne * energyVec->at(ihit) * alpha;
 
-			float hitE = energyVec->at(ihit) * alpha;
-			if(int(cellVecZ->at(ihit)) > 19) hitE = hitE * 2;
+			if(int(cellVecZ->at(ihit)) > 19) hitE = hitE * 2.03;
 
             parameters.m_nCellRadiationLengths = 1.f;
             parameters.m_nCellInteractionLengths = 1.f;
