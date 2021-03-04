@@ -128,10 +128,10 @@ pandora::StatusCode PrepareCaloHitsAlgorithm::Run()
 
 			//const float toGeV = 0.001;
 
-			//float alpha = 0.06071;
-			float alpha = 57.292472;
-			float beta = 0.;
-			float hitE = energyVec->at(ihit) * alpha + beta;
+			float alpha = 29.8;
+
+			float hitE = energyVec->at(ihit) * alpha;
+			if(int(cellVecZ->at(ihit)) > 19) hitE = hitE * 2;
 
             parameters.m_nCellRadiationLengths = 1.f;
             parameters.m_nCellInteractionLengths = 1.f;
