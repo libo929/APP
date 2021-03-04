@@ -52,42 +52,18 @@ def getResolution ( fileName ):
 def energyFit( hist ):
     mean = hist.GetMean();
     rms  = hist.GetRMS();
-    #print (' ***************** 1. mean = %f, RMS = %f \n' % (mean, rms))
+    print (' ***************** 1. mean = %f, RMS = %f \n' % (mean, rms))
 
-    global fitIndex
-    pdfName = "fit" + str(fitIndex) + ".pdf"
-    fitIndex = fitIndex + 1
-    #print ('mean = %f, RMS = %f \n' % (mean, rms))
+    func = TF1("myfun", "[0]*exp(-0.5*((x-[1])/[2])**2)")
+    func.SetParameter(0, 100)
+    func.SetParameter(1, mean)
+    func.SetParameter(2, rms)
 
-    # try CB
-    #x_cb = RooRealVar("Energy" , "Energy (GeV)" , 0 , mean*2)
-    x_cb = RooRealVar("Energy" , "Energy (GeV)" , mean - 5 * rms , mean + 5 * rms)
-    mean_cb = RooRealVar("mean","mean", mean, 0, 2*mean) ;
-    sigma_cb = RooRealVar("sigma" , "sigma" , rms , 0 , 5*rms) ;
-    alpha_cb = RooRealVar("alpha" , "alpha" , 10 , 0 , 50000) ;
-    n_cb = RooRealVar("n" , "n" , 10 , 0 , 10000) ;
-    shape_cb = RooCBShape("cb" , "cb" , x_cb , mean_cb , sigma_cb , alpha_cb , n_cb) ;
+    hist.Fit("myfun", '', '', mean - 2 * rms, mean + 2 * rms)
 
-    dh = RooDataHist("histo" , "GeV" , RooArgList(x_cb) , hist) 
-    frame = x_cb.frame( RooFit.Title('a frame') )
-    dh.plotOn(frame)
-
-    shape_cb.fitTo(dh)
-    shape_cb.plotOn(frame)
-    #frame.GetYaxis().SetTitle('')
-    frame.GetYaxis().SetTitleOffset(1.5)
-    frame.SetTitle('')
-    #frame.Print("cbfit.pdf")
-    frame.Draw()
-    gPad.Print(pdfName);
-    mean_cbv = mean_cb.getVal()
-    sigma_cbv = sigma_cb.getVal()
-
-    mean = mean_cbv
-    rms = sigma_cbv
-    err = mean_cb.getError()
-
-    print (" ------->>>> Crystal Ball fit: mean = %f, sigma = %f" % (mean_cbv, sigma_cbv))
+    mean = func.GetParameter("p1")
+    rms = func.GetParameter("p2")
+    err = 0.
 
     return (mean, rms, err)
 
@@ -101,7 +77,7 @@ gROOT.SetBatch(True)
 c1 = TCanvas( 'c1', 'linearity', 300, 400 )
 c1.SetGrid()
 
-n = 8
+n = 2
 x_f, y_f, z_f, deltaE_f, y_err_f = array( 'd' ), array( 'd' ), array( 'd' ), array( 'd' ), array( 'd' )
 x_err = array( 'd' )
 
