@@ -1,8 +1,5 @@
 {
-   TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("../test.root");
-   if (!f || !f->IsOpen()) {
-      f = new TFile("../test.root");
-   }
+   f = new TFile("../test_30GeV.root");
 
    TTree* tree;
    f->GetObject("testTree",tree);
