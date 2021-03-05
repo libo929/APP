@@ -86,7 +86,7 @@ pandora::StatusCode PrepareCaloHitsAlgorithm::Run()
 
 
 	//for(unsigned int i= 0; i < inTree->GetEntries(); ++i)
-	if(m_nEvent<inTree->GetEntries()-1) 
+	if(m_nEvent<inTree->GetEntries()) 
 	{
 		inTree->GetEntry(m_nEvent++);
 

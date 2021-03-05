@@ -12,39 +12,26 @@ from ROOT import gStyle
 from ROOT import gPad
 from ROOT import TH1F
 from ROOT import TF1
-from ROOT import TText
-
-from ROOT import RooFit
-from ROOT import RooRealVar
-from ROOT import RooConstVar
-from ROOT import RooDataSet
-from ROOT import RooDataHist
-from ROOT import RooGaussian
-from ROOT import RooCBShape
-from ROOT import RooPlot
-from ROOT import RooArgList
+from ROOT import TLatex
+from ROOT import TPad
 
 
 from math  import sin
 from array import array
 #-----------------------------------------------------------------
 
-fitIndex=0
-
 
 #-----------------------------------------------------------------
 def getResolution ( fileName ):
     myfile = TFile( fileName )
     mychain = gDirectory.Get( 'testTree' )
-    mychain.Draw("mainClustersEnergy>>tmpHist", "", "goff")
-    hist = gDirectory.Get("tmpHist");
+    mychain.Draw('mainClustersEnergy>>tmpHist', '', 'goff')
+    hist = gDirectory.Get('tmpHist');
     
-    print ( fileName )
+    #print ( fileName )
     #print ('nevent: %i ' % (entries))
-
-    meanrms = energyFit( hist )
   
-    return meanrms
+    return energyFit( hist )
 
 
 
@@ -52,20 +39,23 @@ def getResolution ( fileName ):
 def energyFit( hist ):
     mean = hist.GetMean();
     rms  = hist.GetRMS();
-    print (' ***************** 1. mean = %f, RMS = %f \n' % (mean, rms))
+    #print (' ***************** 1. mean = %f, RMS = %f \n' % (mean, rms))
 
-    func = TF1("myfun", "[0]*exp(-0.5*((x-[1])/[2])**2)")
+    func = TF1('myfun', '[0]*exp(-0.5*((x-[1])/[2])**2)')
     func.SetParameter(0, 100)
     func.SetParameter(1, mean)
     func.SetParameter(2, rms)
 
-    hist.Fit("myfun", '', '', mean - 2 * rms, mean + 2 * rms)
+    hist.Fit('myfun', 'q', '', mean - 1.5 * rms, mean + 1.5 * rms)
 
-    mean = func.GetParameter("p1")
-    rms = func.GetParameter("p2")
-    err = 0.
+    mean = func.GetParameter('p1')
+    rms = func.GetParameter('p2')
 
-    return (mean, rms, err)
+    #print(func.GetParError(0), func.GetParError(1), func.GetParError(1))
+    meanerr = func.GetParError(1)
+    rmserr  = func.GetParError(2)
+
+    return (mean, rms, meanerr, rmserr)
 
 
 
@@ -77,46 +67,65 @@ gROOT.SetBatch(True)
 c1 = TCanvas( 'c1', 'linearity', 300, 400 )
 c1.SetGrid()
 
-n = 2
-x_f, y_f, z_f, deltaE_f, y_err_f = array( 'd' ), array( 'd' ), array( 'd' ), array( 'd' ), array( 'd' )
-x_err = array( 'd' )
+n = 8
+energyVec = array( 'f' )
+energyErrorVec = array( 'f' )
+
+recoEnergyVec = array( 'f' )
+recoEnergyErrorVec = array( 'f' )
+
+deltaE_f = array( 'f' ) 
+relEnergyErrorVec = array( 'f' ) 
+   
+relEnergyErrorErrorVec = array( 'f' )
 
 for i in range( n ):
    energyNominal = (i + 1 ) * 10
-   x_f.append( energyNominal )
 
    fileName = 'reco_gamma_' + str(energyNominal) + 'GeV.root'
-   reso = getResolution( fileName )
-   print ('mean = %f, RMS = %f , error = %f \n' % (reso[0], reso[1], reso[2]))
-   y_f.append( reso[0] )
-   #z.append( reso[1]/reso[0] )
-   z_f.append( reso[1]/energyNominal )
-   deltaE_f.append( (reso[0] - energyNominal)/energyNominal )
-   y_err_f.append(reso[2])  
-   x_err.append( 0. )
-   print ('---->>>>>>>>', reso[2])
 
-#c1.Divide(2,1)
+   # mean, rms, meanerr, rmserr
+   reso = getResolution( fileName )
+
+   energyVec.append( energyNominal )
+   energyErrorVec.append( 0. )
+
+   # mean
+   recoEnergyVec.append( reso[0] )
+
+   # meanerr
+   recoEnergyErrorVec.append( reso[2] )
+   #print(reso[2])
+
+   # 
+   deltaE_f.append( (reso[0] - energyNominal)/energyNominal )
+
+   # resolution (relative error)
+   relEnergyErrorVec.append( reso[1]/energyNominal )
+
+   #
+   relEnergyErrorErrorVec.append( reso[2]/energyNominal )
+
 small=1.e-5
 c1.Divide(1,2,small,small);
-
-labelSize=10
 
 c1.cd(1)
 gPad.SetPad(small, 0.3, 1.-small, 1.-small);
 gPad.SetBottomMargin(small);
 
-makerSize = 0.6
+labelSize=10
+makerSize = 0.3
 
-gr = TGraphErrors( n, x_f, y_f, x_err, y_err_f )
+gStyle.SetEndErrorSize(0)
+
+gr = TGraphErrors( n, energyVec, recoEnergyVec, energyErrorVec, recoEnergyErrorVec )
 gr.SetName('gr')
 gr.SetLineColor( 1 )
 gr.SetLineWidth( 1 )
 gr.SetLineStyle( 2 )
-gr.SetMarkerColor( 4 )
+gr.SetMarkerColor( 2 )
 gr.SetMarkerStyle( 20 )
 gr.SetMarkerSize( makerSize )
-#gr.SetTitle( 'linearity' )
 textsize = labelSize/(gPad.GetWh()*gPad.GetAbsHNDC());
 gr.SetTitle( '' )
 gr.GetXaxis().SetTitle( 'E_{particle} (GeV)' )
@@ -128,31 +137,29 @@ gr.GetYaxis().SetRangeUser(2, 100)
 gPad.SetLeftMargin(0.15);
 gr.Draw( 'AP' )
 
-func1 = TF1("fun1","x", 0., 100.);
-func1.SetLineColor(1)
+func1 = TF1('fun1', 'x', 0., 100.);
+func1.SetLineColor(4)
 func1.SetLineStyle(2)
-func1.Draw("same")
+func1.Draw('same')
 ####
+
 
 c1.cd(2)
 gPad.SetPad(small, small, 1.-small, 0.3-small);
 gPad.SetTopMargin(small);
-#gPad.SetRightMargin(small);
 gPad.SetLeftMargin(0.15);
 gPad.SetBottomMargin(0.3);
 gPad.SetTickx();
 
-gr1 = TGraph( n, x_f, deltaE_f )
+gr1 = TGraph( n, energyVec, deltaE_f )
 gr1.SetLineColor( 1 )
 gr1.SetLineWidth( 1 )
 gr1.SetMarkerStyle( 20 )
 gr1.SetMarkerSize( makerSize )
-gr1.SetMarkerColor( 4 )
-#gr1.SetTitle( 'energy resolution' )
+gr1.SetMarkerColor( 2 )
 gr1.SetTitle( '' )
 textsize = labelSize/(gPad.GetWh()*gPad.GetAbsHNDC());
 gr1.GetXaxis().SetTitle( 'E_{particle} (GeV)' )
-#gr1.GetYaxis().SetTitle( '#sigma_{E}/E_{rec}' )
 gr1.GetYaxis().SetTitle( '#DeltaE/E_{particle}' )
 gr1.GetXaxis().SetTitleOffset(1.2)
 gr1.GetYaxis().SetTitleOffset(0.6)
@@ -164,32 +171,31 @@ gr1.GetYaxis().SetRangeUser(-0.15, 0.15)
 gr1.GetYaxis().SetNdivisions(505)
 gr1.Draw( 'AP' );
 
-func2 = TF1("fun2","0", 0., 100.);
+func2 = TF1('fun2','0', 0., 100.);
+func2.SetLineColor(4)
 func2.SetLineStyle(2)
-func2.SetLineColor(1)
-func2.Draw("same")
+func2.Draw('same')
 
 # TCanvas.Update() draws the frame, after which one can change it
 c1.Update()
-#c1.GetFrame().SetFillColor( 21 )
 c1.GetFrame().SetBorderSize( 12 )
 c1.Modified()
 c1.Update()
-c1.Print("linearity.pdf")
+c1.Print('linearity.pdf')
+
+
 
 #-------------------------------------------------
-c2 = TCanvas( 'c2', 'resolution', 300, 300 )
+c2 = TCanvas( 'c2', 'resolution', 300, 400 )
 
-gr2 = TGraph( n, x_f, z_f )
+gr2 = TGraphErrors( n, energyVec, relEnergyErrorVec , energyErrorVec, relEnergyErrorErrorVec)
 gr2.SetName('gr2')
 gr2.SetLineColor( 1 )
 gr2.SetLineWidth( 1 )
 gr2.SetLineStyle( 2 )
-gr2.SetMarkerColor( 4 )
+gr2.SetMarkerColor( 2 )
 gr2.SetMarkerStyle( 20 )
 gr2.SetMarkerSize( makerSize )
-#gr2.SetTitle( 'linearity' )
-#textsize = labelSize/(gPad.GetWh()*gPad.GetAbsHNDC());
 gr2.SetTitle( '' )
 gr2.GetXaxis().SetTitle( 'E_{particle} (GeV)' )
 gr2.GetYaxis().SetTitle( '#sigma_{E}/E_{particle}' )
@@ -200,19 +206,20 @@ gPad.SetLeftMargin(0.15);
 gr2.Draw( 'AP' )
 
 funReso = TF1('detReso', 'sqrt([0]*[0]/x+[1]*[1])', 0., 100.);
-#funReso = TF1('detReso', 'sqrt(0.22*0.22/x+0.00008)', 0., 100.);
 funReso.SetLineStyle(9)
-funReso.SetLineColor(2)
-gr2.Fit('detReso')
+funReso.SetLineColor(4)
+gr2.Fit('detReso', 'q')
 
-#funReso.Draw('same')
-a0 = funReso.GetParameter('p0')
-a1 = funReso.GetParameter('p1')
+a0 = funReso.GetParameter('p0') * 100.
+a1 = funReso.GetParameter('p1') * 100.
 
-print(a0, a1)
+resoFormula = '#frac{#sigma_{E}}{E} = #frac{' + str( round(a0, 1) ) + '%}{#sqrt{E}} #oplus ' + str( round(a1, 1) ) + '%'
 
-c2.Update()
-c2.GetFrame().SetBorderSize( 12 )
-c2.Modified()
-c2.Update()
-c2.Print("resolution.pdf")
+txt = TLatex()
+txt.SetTextSize(0.035)
+txt.DrawLatex(35., 0.08, resoFormula)
+
+
+c2.Print('resolution.pdf')
+
+print('Fitting results:', a0, a1)
