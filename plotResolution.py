@@ -181,7 +181,7 @@ c1.Update()
 c1.GetFrame().SetBorderSize( 12 )
 c1.Modified()
 c1.Update()
-c1.Print('linearity.pdf')
+c1.Print('linearity.eps')
 
 
 
@@ -220,6 +220,6 @@ txt.SetTextSize(0.035)
 txt.DrawLatex(35., 0.08, resoFormula)
 
 
-c2.Print('resolution.pdf')
+c2.Print('resolution.eps')
 
 print('Fitting results:', a0, a1)
