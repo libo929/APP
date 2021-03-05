@@ -131,7 +131,7 @@ pandora::StatusCode PrepareCaloHitsAlgorithm::Run()
 			//float hitE = energyVec->at(ihit) * alpha;
 
 			const float mipE = 3.6e-9;
-			const float alpha = 29.5;
+			const float alpha = 29.6;
 			double ne = energyVec->at(ihit) / mipE;
 			float hitE = gRandom->Poisson(ne) / ne * energyVec->at(ihit) * alpha;
 			//float hitE = ne/ne * energyVec->at(ihit) * alpha;
