@@ -101,10 +101,10 @@ for i in range( n ):
    deltaE_f.append( (reso[0] - energyNominal)/energyNominal )
 
    # resolution (relative error)
-   relEnergyErrorVec.append( reso[1]/energyNominal )
+   relEnergyErrorVec.append( reso[1]/reso[0] )
 
    #
-   relEnergyErrorErrorVec.append( reso[2]/energyNominal )
+   relEnergyErrorErrorVec.append( reso[3]/reso[0] )
 
 small=1.e-5
 c1.Divide(1,2,small,small);
@@ -129,7 +129,7 @@ gr.SetMarkerSize( makerSize )
 textsize = labelSize/(gPad.GetWh()*gPad.GetAbsHNDC());
 gr.SetTitle( '' )
 gr.GetXaxis().SetTitle( 'E_{particle} (GeV)' )
-gr.GetYaxis().SetTitle( 'E_{rec} (GeV)' )
+gr.GetYaxis().SetTitle( 'E_{reco} (GeV)' )
 gr.GetYaxis().SetTitleSize(textsize)
 gr.GetYaxis().SetLabelSize(textsize)
 gr.GetYaxis().SetTitleOffset(1.4)
@@ -198,7 +198,7 @@ gr2.SetMarkerStyle( 20 )
 gr2.SetMarkerSize( makerSize )
 gr2.SetTitle( '' )
 gr2.GetXaxis().SetTitle( 'E_{particle} (GeV)' )
-gr2.GetYaxis().SetTitle( '#sigma_{E}/E_{particle}' )
+gr2.GetYaxis().SetTitle( '#sigma_{reco}/E_{reco}' )
 gr2.GetXaxis().SetTitleOffset(1.2)
 gr2.GetYaxis().SetTitleOffset(1.9)
 gr2.GetYaxis().SetRangeUser(0, 0.1)
@@ -213,7 +213,7 @@ gr2.Fit('detReso', 'q')
 a0 = funReso.GetParameter('p0') * 100.
 a1 = funReso.GetParameter('p1') * 100.
 
-resoFormula = '#frac{#sigma_{E}}{E} = #frac{' + str( round(a0, 1) ) + '%}{#sqrt{E}} #oplus ' + str( round(a1, 1) ) + '%'
+resoFormula = '#frac{#sigma}{E} = #frac{' + str( round(a0, 1) ) + '%}{#sqrt{E}} #oplus ' + str( round(a1, 1) ) + '%'
 
 txt = TLatex()
 txt.SetTextSize(0.035)
