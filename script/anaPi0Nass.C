@@ -1,5 +1,5 @@
 {
-   f = new TFile("../test_30GeV.root");
+   f = new TFile("../reco_pi0_10GeV.root");
 
    TTree* tree;
    f->GetObject("testTree",tree);
@@ -58,14 +58,14 @@
 	   float iClusterEnergy = it1->first;
 	   TVector3 iClusterCentroid = it1->second;
 
-	   if(iClusterEnergy<0.05) continue;
+	   if(iClusterEnergy<1.) continue;
 
 	   // the cluster with the second largest energy
 	   ++it1;
 	   float jClusterEnergy = it1->first;
 	   TVector3 jClusterCentroid = it1->second;
 	   
-	   if(jClusterEnergy<0.05) continue;
+	   if(jClusterEnergy<1.) continue;
 
 	   float theta = iClusterCentroid.Angle(jClusterCentroid);
 	   float mass2 = 2. * iClusterEnergy * jClusterEnergy * ( 1. - TMath::Cos(theta) );
