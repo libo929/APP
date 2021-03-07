@@ -1,10 +1,10 @@
 {
 	const double pi0Mass = 0.135; // GeV
-	const double totalEnergy = 20.135; // GeV
+	const double totalEnergy = 10.135; // GeV
 	const double gammaFactor = totalEnergy / pi0Mass;
 	const double betaFactor  = sqrt(1. - 1./gammaFactor/gammaFactor);
 
-	const double ecal_a0 = 0.20;
+	const double ecal_a0 = 0.17;
 	const double ecal_a1 = 0.01;
 
 	ROOT::Math::XYZTVector pi0Vec;
