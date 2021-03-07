@@ -116,11 +116,11 @@
 
 
 	<algorithm type = "NearbyFragmentsMerging">
-	  <MaxClosestFragmentDistance> 80. </MaxClosestFragmentDistance>
+	  <MaxClosestFragmentDistance> 20. </MaxClosestFragmentDistance>
 	</algorithm>
 	<algorithm type="ClustersMerging">
 	  <UseEnergyChi> false </UseEnergyChi>
-	  <MaxMergingEnergy> 3. </MaxMergingEnergy>
+	  <MaxMergingEnergy> 0.8 </MaxMergingEnergy>
 	  <UseMCTruth> false </UseMCTruth>
 	  <MergeIssue> false </MergeIssue>
 	  <MergeError> false </MergeError>
