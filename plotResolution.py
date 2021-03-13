@@ -26,7 +26,7 @@ def getResolution ( fileName ):
     myfile = TFile( fileName )
     mychain = gDirectory.Get( 'testTree' )
     mychain.Draw('mainClustersEnergy>>tmpHist', '', 'goff')
-    hist = gDirectory.Get('tmpHist');
+    hist = gDirectory.Get('tmpHist')
     
     #print ( fileName )
     #print ('nevent: %i ' % (entries))
@@ -37,8 +37,8 @@ def getResolution ( fileName ):
 
 #-----------------------------------------------------------------
 def energyFit( hist ):
-    mean = hist.GetMean();
-    rms  = hist.GetRMS();
+    mean = hist.GetMean()
+    rms  = hist.GetRMS()
     #print (' ***************** 1. mean = %f, RMS = %f \n' % (mean, rms))
 
     func = TF1('myfun', '[0]*exp(-0.5*((x-[1])/[2])**2)')
@@ -107,11 +107,11 @@ for i in range( n ):
    relEnergyErrorErrorVec.append( reso[3]/reso[0] )
 
 small=1.e-5
-c1.Divide(1,2,small,small);
+c1.Divide(1,2,small,small)
 
 c1.cd(1)
-gPad.SetPad(small, 0.3, 1.-small, 1.-small);
-gPad.SetBottomMargin(small);
+gPad.SetPad(small, 0.3, 1.-small, 1.-small)
+gPad.SetBottomMargin(small)
 
 labelSize=10
 makerSize = 0.3
@@ -126,7 +126,7 @@ gr.SetLineStyle( 2 )
 gr.SetMarkerColor( 2 )
 gr.SetMarkerStyle( 20 )
 gr.SetMarkerSize( makerSize )
-textsize = labelSize/(gPad.GetWh()*gPad.GetAbsHNDC());
+textsize = labelSize/(gPad.GetWh()*gPad.GetAbsHNDC())
 gr.SetTitle( '' )
 gr.GetXaxis().SetTitle( 'E_{particle} (GeV)' )
 gr.GetYaxis().SetTitle( 'E_{reco} (GeV)' )
@@ -134,10 +134,10 @@ gr.GetYaxis().SetTitleSize(textsize)
 gr.GetYaxis().SetLabelSize(textsize)
 gr.GetYaxis().SetTitleOffset(1.4)
 gr.GetYaxis().SetRangeUser(2, 100)
-gPad.SetLeftMargin(0.15);
+gPad.SetLeftMargin(0.15)
 gr.Draw( 'AP' )
 
-func1 = TF1('fun1', 'x', 0., 100.);
+func1 = TF1('fun1', 'x', 0., 100.)
 func1.SetLineColor(4)
 func1.SetLineStyle(2)
 func1.Draw('same')
@@ -145,11 +145,11 @@ func1.Draw('same')
 
 
 c1.cd(2)
-gPad.SetPad(small, small, 1.-small, 0.3-small);
-gPad.SetTopMargin(small);
-gPad.SetLeftMargin(0.15);
-gPad.SetBottomMargin(0.3);
-gPad.SetTickx();
+gPad.SetPad(small, small, 1.-small, 0.3-small)
+gPad.SetTopMargin(small)
+gPad.SetLeftMargin(0.15)
+gPad.SetBottomMargin(0.3)
+gPad.SetTickx()
 
 gr1 = TGraph( n, energyVec, deltaE_f )
 gr1.SetLineColor( 1 )
@@ -158,7 +158,7 @@ gr1.SetMarkerStyle( 20 )
 gr1.SetMarkerSize( makerSize )
 gr1.SetMarkerColor( 2 )
 gr1.SetTitle( '' )
-textsize = labelSize/(gPad.GetWh()*gPad.GetAbsHNDC());
+textsize = labelSize/(gPad.GetWh()*gPad.GetAbsHNDC())
 gr1.GetXaxis().SetTitle( 'E_{particle} (GeV)' )
 gr1.GetYaxis().SetTitle( '#DeltaE/E_{particle}' )
 gr1.GetXaxis().SetTitleOffset(1.2)
@@ -169,9 +169,9 @@ gr1.GetXaxis().SetTitleSize(textsize)
 gr1.GetYaxis().SetLabelSize(textsize)
 gr1.GetYaxis().SetRangeUser(-0.15, 0.15)
 gr1.GetYaxis().SetNdivisions(505)
-gr1.Draw( 'AP' );
+gr1.Draw( 'AP' )
 
-func2 = TF1('fun2','0', 0., 100.);
+func2 = TF1('fun2','0', 0., 100.)
 func2.SetLineColor(4)
 func2.SetLineStyle(2)
 func2.Draw('same')
@@ -202,10 +202,10 @@ gr2.GetYaxis().SetTitle( '#sigma_{reco}/E_{reco}' )
 gr2.GetXaxis().SetTitleOffset(1.2)
 gr2.GetYaxis().SetTitleOffset(1.9)
 gr2.GetYaxis().SetRangeUser(0, 0.1)
-gPad.SetLeftMargin(0.15);
+gPad.SetLeftMargin(0.15)
 gr2.Draw( 'AP' )
 
-funReso = TF1('detReso', 'sqrt([0]*[0]/x+[1]*[1])', 0., 100.);
+funReso = TF1('detReso', 'sqrt([0]*[0]/x+[1]*[1])', 0., 100.)
 funReso.SetLineStyle(9)
 funReso.SetLineColor(4)
 gr2.Fit('detReso', 'q')
